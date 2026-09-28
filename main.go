@@ -274,7 +274,13 @@ func find(dir, query string) (string, error) {
 	return hits[0].path, nil
 }
 
+// open uses $BROWSER when set (CI sets it to echo), else the platform opener.
 func open(path string) error {
+	if browser := os.Getenv("BROWSER"); browser != "" {
+		cmd := exec.Command(browser, path)
+		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+		return cmd.Run()
+	}
 	cmd := "xdg-open"
 	switch runtime.GOOS {
 	case "darwin":

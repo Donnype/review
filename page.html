@@ -39,7 +39,8 @@ main{flex:1;min-width:0;padding:16px}
 .fhead{position:sticky;top:48px;z-index:2;display:flex;gap:8px;align-items:center;padding:6px 10px;cursor:pointer;
   background:var(--hbg);border-bottom:1px solid var(--bd);border-radius:6px 6px 0 0}
 .collapsed .fhead{border-bottom:0;border-radius:6px}.collapsed .fbody{display:none}
-.chev{color:var(--muted);transition:transform .1s}.collapsed .chev{transform:rotate(-90deg)}
+.chev{flex:none;width:20px;height:20px;padding:2px;margin:-2px 0;border-radius:4px;color:var(--muted);transition:transform .1s}
+.fhead:hover .chev{color:var(--fg);background:var(--hover)}.collapsed .chev{transform:rotate(-90deg)}
 .name{font:600 12px var(--mono);flex:1;overflow-wrap:anywhere}.stat{font:12px var(--mono);white-space:nowrap}
 .badge{font:600 10px/14px var(--mono);width:16px;text-align:center;border:1px solid;border-radius:4px;flex:none}
 .badge.added{color:var(--green)}.badge.deleted{color:var(--red)}.badge.renamed{color:var(--blue)}.badge.modified{color:var(--orange)}
@@ -220,7 +221,7 @@ function table(f) {
 
 const label = f => f.status === 'renamed' ? `${f.old} → ${f.new}` : f.name;
 main.innerHTML = files.map((f, i) => `<section class="file" id="f${i}">
-  <div class="fhead"><span class="chev">▾</span><span class="badge ${f.status}" title="${f.status}">${f.status[0].toUpperCase()}</span>
+  <div class="fhead"><svg class="chev" viewBox="0 0 16 16"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge ${f.status}" title="${f.status}">${f.status[0].toUpperCase()}</span>
   <span class="name">${esc(label(f))}</span><span class="stat"><span class="a">+${f.adds}</span> <span class="d">−${f.dels}</span></span>
   <label class="vw"><input type="checkbox" data-file> Viewed</label></div><div class="fbody"></div></section>`).join('');
 tree.innerHTML = files.map((f, i) => {

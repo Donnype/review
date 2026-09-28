@@ -28,6 +28,9 @@ matching different names is an error that lists them.
 **Trash**: `~/.Trash` on macOS (no Finder "Put Back"; use `review restore`), `$TMPDIR/review-trash` elsewhere, where
 the OS eventually cleans it up.
 
+**Browser**: set `$BROWSER` to open pages with a specific program (`BROWSER=firefox review …`). Without it, the
+platform opener is used.
+
 ## How it works
 
 ```
@@ -109,3 +112,11 @@ changes shape (file names/statuses, line numbers, word marks, content-keyed hunk
 To update highlight.js, replace `highlight.min.js` with another "common" build from
 `https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@<version>/build/highlight.min.js` and rebuild. The next render
 overwrites the cached copy, because the size check notices the change.
+
+### CI
+
+`.github/workflows/build.yaml` runs on pushes to `main` and on pull requests, on Linux (x64 and arm64), macOS (arm64)
+and Windows (x64). Each job vets, runs `parse_test.mjs`, builds a stripped binary, and smoke-tests that binary against
+a small patch: render from a file and from stdin, `list`, `open` by prefix, `rm`/`restore` and `completion`. It uses
+`BROWSER=echo` so nothing opens. The binary is uploaded as the `review-<OS>-<arch>` artifact.
+`.gitattributes` forces LF line endings, so Windows checkouts pass `gofmt` and the parser test.
