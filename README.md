@@ -7,6 +7,16 @@ kept in the browser's localStorage. One static Go binary, no Go dependencies, no
 git diff --staged | review
 ```
 
+## Install
+
+```sh
+go install github.com/Donnype/review@latest
+```
+
+This builds from source into `$(go env GOPATH)/bin` (usually `~/go/bin`); make sure that's on your `PATH`. It needs Go
+1.27+, or an older Go that downloads 1.27 itself (the default `GOTOOLCHAIN=auto`). Prebuilt binaries for Linux, macOS
+and Windows are attached to each CI run as artifacts.
+
 ## Usage
 
 | Command                    | What it does                                                                                     |
