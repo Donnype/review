@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>{{TITLE}}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{color-scheme:light dark;--split:.5;--bg:#fff;--fg:#1f2328;--muted:#59636e;--bd:#d1d9e0;--hbg:#f6f8fa;--hover:#eff2f5;--hunk:#ddf4ff;--empty:#f6f8fa;
+  --add:#e6ffec;--addln:#ccffd8;--addw:#abf2bc;--del:#ffebe9;--delln:#ffd7d5;--delw:#ff818266;--green:#1a7f37;--red:#d1242f;
+  --blue:#0969da;--orange:#9a6700;--sx-k:#d73a49;--sx-t:#6f42c1;--sx-c:#005cc5;--sx-s:#032f62;--sx-b:#e36209;--sx-cm:#6a737d;
+  --sx-n:#22863a;--sx-bu:#735c0f;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#212830;--fg:#d1d7e0;--muted:#9198a1;--bd:#3d444d;--hbg:#262c36;--hover:#2f3742;
+  --hunk:#4184e41a;--empty:#262c36;--add:#46954a26;--addln:#57ab5a4d;--addw:#46954a66;--del:#e5534b1a;--delln:#e5534b4d;
+  --delw:#e5534b66;--green:#57ab5a;--red:#e5534b;--blue:#478be6;--orange:#c69026;
+  --sx-k:#f47067;--sx-t:#dcbdfb;--sx-c:#6cb6ff;--sx-s:#96d0ff;--sx-b:#f69d50;--sx-cm:#9198a1;--sx-n:#8ddb8c;--sx-bu:#eac55f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+button{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--bd);padding:3px 10px;cursor:pointer}
+input[type=checkbox]{appearance:none;width:14px;height:14px;margin:0 4px 0 0;vertical-align:-2px;cursor:pointer;
+  border:1px solid var(--muted);border-radius:3px;background:var(--bg) center/12px no-repeat;transition:background-color .1s}
+input[type=checkbox]:checked{background-color:var(--blue);border-color:var(--blue);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'/%3E%3C/svg%3E")}
+input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+progress{accent-color:var(--green)}
+header{position:sticky;top:0;z-index:3;height:48px;display:flex;align-items:center;gap:16px;padding:0 16px;
+  background:var(--hbg);border-bottom:1px solid var(--bd)}
+header h1{font-size:15px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.a{color:var(--green)}.d{color:var(--red)}
+#progress{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.seg{display:flex}.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0;border-left:0}
+.seg button.on{background:var(--hover);font-weight:600}
+#layout{display:flex}
+nav{position:sticky;top:48px;height:calc(100vh - 48px);width:300px;flex:none;overflow:auto;border-right:1px solid var(--bd);padding:12px}
+nav input{width:100%;padding:5px 8px;margin-bottom:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--fg)}
+nav ul{list-style:none;margin:0;padding:0}
+nav a{display:flex;gap:6px;padding:3px 6px;border-radius:6px;color:var(--fg);text-decoration:none;font-size:13px}
+nav a:hover{background:var(--hover)}
+nav .p{flex:1;overflow-wrap:break-word;min-width:0}nav .dir{color:var(--muted)}
+nav li.viewed .p{color:var(--muted)}nav li.viewed .p::before{content:"✓ ";color:var(--green)}
+main{flex:1;min-width:0;padding:16px}
+.file{border:1px solid var(--bd);border-radius:6px;margin-bottom:16px;scroll-margin-top:64px}
+.fhead{position:sticky;top:48px;z-index:2;display:flex;gap:8px;align-items:center;padding:6px 10px;cursor:pointer;
+  background:var(--hbg);border-bottom:1px solid var(--bd);border-radius:6px 6px 0 0}
+.collapsed .fhead{border-bottom:0;border-radius:6px}.collapsed .fbody{display:none}
+.chev{color:var(--muted);transition:transform .1s}.collapsed .chev{transform:rotate(-90deg)}
+.name{font:600 12px var(--mono);flex:1;overflow-wrap:anywhere}.stat{font:12px var(--mono);white-space:nowrap}
+.badge{font:600 10px/14px var(--mono);width:16px;text-align:center;border:1px solid;border-radius:4px;flex:none}
+.badge.added{color:var(--green)}.badge.deleted{color:var(--red)}.badge.renamed{color:var(--blue)}.badge.modified{color:var(--orange)}
+.vw{font-size:12px;border:1px solid var(--bd);border-radius:6px;padding:2px 8px;cursor:pointer;white-space:nowrap;background:var(--bg)}
+.file.viewed .vw{background:var(--hunk);border-color:var(--blue)}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font:12px/20px var(--mono)}
+col.lnc{width:52px}/* Both code columns need a percentage: <col> ignores calc() mixing % and px. */
+col.sl{width:calc(var(--split) * 100%)}col.sr{width:calc((1 - var(--split)) * 100%)}
+.fbody{position:relative}
+/* Drag handle: the divider plus the right side's line-number column. */
+.gutter{position:absolute;top:0;bottom:0;left:calc(52px + (100% - 104px) * var(--split));width:60px;margin-left:-4px;cursor:col-resize}
+.gutter:hover,.gutter.drag{background:linear-gradient(var(--blue),var(--blue)) 3px 0/2px 100% no-repeat}
+td{padding:0 8px;vertical-align:top}
+.ln{text-align:right;color:var(--muted);user-select:none}
+.c{white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4}
+.c::before{content:attr(data-s);user-select:none;padding-right:8px}
+tr.add td,td.add{background:var(--add)}tr.add .ln,.ln.add{background:var(--addln)}
+tr.del td,td.del{background:var(--del)}tr.del .ln,.ln.del{background:var(--delln)}
+mark{color:inherit;border-radius:2px;background:var(--addw)}tr.del mark,td.del mark{background:var(--delw)}
+td.empty{background:var(--empty)}
+.split td.c+td.ln{border-left:1px solid var(--bd)}
+.hh td{background:var(--hunk);color:var(--muted);padding:4px 8px}.hh label{cursor:pointer}
+tbody.done tr:not(.hh){opacity:.4}
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:var(--sx-k)}
+.hljs-title{color:var(--sx-t)}.hljs-string,.hljs-regexp,.hljs-meta .hljs-string{color:var(--sx-s)}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable,.hljs-section{color:var(--sx-c)}
+.hljs-built_in,.hljs-symbol{color:var(--sx-b)}.hljs-code,.hljs-comment,.hljs-formula{color:var(--sx-cm)}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:var(--sx-n)}.hljs-bullet{color:var(--sx-bu)}
+.hljs-emphasis{font-style:italic}.hljs-strong,.hljs-section{font-weight:700}
+.note{padding:12px 16px;color:var(--muted)}
+@media (max-width:800px){nav{display:none}header h1{display:none}}
+</style></head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <span id="totals" class="stat"></span>
+  <span id="progress"><span id="count"></span><progress id="bar"></progress></span>
+  <span class="seg"><button data-view="unified">Unified</button><button data-view="split">Split</button></span>
+  <span class="seg"><button id="expand">Expand all</button><button id="collapse">Collapse all</button></span>
+</header>
+<div id="layout"><nav><input id="filter" placeholder="Filter files…"><ul id="tree"></ul></nav><main id="files"></main></div>
+<script src="highlight.min.js"></script>
+<script id="diff" type="application/json">{{DIFF}}</script>
+<script>
+const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
+
+// cyrb53: short content hash, so checks follow the content and survive re-rendering the same change.
+function hash(str) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+// localStorage is the only state; it can be unavailable (private windows, blocked file:// storage).
+const store = {
+  get(k) { try { return localStorage.getItem('review:' + k); } catch { return null; } },
+  set(k, v) { try { v == null ? localStorage.removeItem('review:' + k) : localStorage.setItem('review:' + k, v); } catch {} },
+};
+
+function path(s) {
+  s = s.split('\t')[0].replace(/^"(.*)"$/, '$1');
+  return s === '/dev/null' ? null : s.replace(/^[ab]\//, '');
+}
+
+// Parses git diff, git format-patch and plain `diff -u` output. Hunk line counts decide where a hunk ends,
+// so removed lines that look like "--- x" aren't mistaken for file headers.
+function parse(text) {
+  const files = [];
+  let f = null, h = null, remOld = 0, remNew = 0, o = 0, n = 0;
+  const start = () => (f = {old: null, new: null, hunks: [], raw: '', meta: '', binary: false}, files.push(f), h = null);
+  for (const line of text.split('\n')) {
+    if (h && (remOld > 0 || remNew > 0) && !line.startsWith('diff --git ')) {
+      const t = line[0] || ' ';
+      if (t === '\\') continue;
+      if (t === '+') { h.lines.push({t, s: line.slice(1), n: n++}); remNew--; }
+      else if (t === '-') { h.lines.push({t, s: line.slice(1), o: o++}); remOld--; }
+      else { h.lines.push({t: ' ', s: line.slice(1), o: o++, n: n++}); remOld--; remNew--; }
+      h.raw += line + '\n';
+      continue;
+    }
+    let m;
+    if (line.startsWith('diff --git ')) {
+      start();
+      if ((m = line.match(/^diff --git "?a\/(.*?)"? "?b\/(.*?)"?$/))) [f.old, f.new] = [m[1], m[2]];
+    } else if (line.startsWith('--- ')) {
+      if (!f || f.hunks.length) start();
+      f.old = path(line.slice(4));
+    } else if (!f) {
+      continue;
+    } else if (line.startsWith('+++ ')) {
+      f.new = path(line.slice(4));
+    } else if ((m = line.match(/^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(.*)/))) {
+      [o, remOld, n, remNew] = [+m[1], m[2] == null ? 1 : +m[2], +m[3], m[4] == null ? 1 : +m[4]];
+      h = {head: line, lines: [], raw: ''};
+      f.hunks.push(h);
+    } else if (line.startsWith('new file mode')) { f.old = null; f.meta += line + '\n'; }
+    else if (line.startsWith('deleted file mode')) { f.new = null; f.meta += line + '\n'; }
+    else if (line.startsWith('rename from ')) f.old = line.slice(12);
+    else if (line.startsWith('rename to ')) f.new = line.slice(10);
+    else if (line.startsWith('Binary files') || line.startsWith('GIT binary patch')) { f.binary = true; f.meta += line + '\n'; }
+    else if (/^(old|new) mode /.test(line)) f.meta += line + '\n';
+  }
+  for (const f of files) {
+    f.name = f.new ?? f.old;
+    f.status = f.old == null ? 'added' : f.new == null ? 'deleted' : f.old !== f.new ? 'renamed' : 'modified';
+    f.adds = f.dels = 0;
+    for (const h of f.hunks) for (const l of h.lines) l.t === '+' ? f.adds++ : l.t === '-' && f.dels++;
+    // Keyed by path + content, not line numbers: a hunk stays checked when earlier edits shift it.
+    f.keys = f.hunks.length ? f.hunks.map(h => hash(f.name + '\n' + h.raw)) : [hash(f.old + '\n' + f.new + '\n' + f.meta)];
+  }
+  return files;
+}
+
+// Pairs each run of deletions with the following additions (for split view) and highlights the changed span.
+// Highlighting is per line, so constructs spanning lines (block comments, template strings) can mis-color.
+const hl = (s, lang) => lang ? hljs.highlight(s, {language: lang, ignoreIllegals: true}).value : esc(s);
+
+function language(name) {
+  if (typeof hljs === 'undefined') return null;
+  const base = name.split('/').pop().toLowerCase(), ext = base.includes('.') ? base.split('.').pop() : base;
+  return hljs.getLanguage(ext) ? ext : null;
+}
+
+function prep(h, lang) {
+  h.pairs = [];
+  const L = h.lines;
+  for (let i = 0; i < L.length;) {
+    if (L[i].t === ' ') { L[i].html = hl(L[i].s, lang); h.pairs.push([L[i], L[i++]]); continue; }
+    const dels = [], adds = [];
+    while (i < L.length && L[i].t === '-') dels.push(L[i++]);
+    while (i < L.length && L[i].t === '+') adds.push(L[i++]);
+    for (let j = 0; j < Math.max(dels.length, adds.length); j++) {
+      const d = dels[j], a = adds[j];
+      if (d && a) [d.html, a.html] = mark(d.s, a.s, lang);
+      else (d || a).html = hl((d || a).s, lang);
+      h.pairs.push([d, a]);
+    }
+  }
+}
+
+function mark(a, b, lang) {
+  const m = Math.min(a.length, b.length);
+  let p = 0, s = 0;
+  while (p < m && a[p] === b[p]) p++;
+  while (s < m - p && a[a.length - 1 - s] === b[b.length - 1 - s]) s++;
+  const one = x => {
+    const mid = x.slice(p, x.length - s);
+    return (p || s) && mid ? hl(x.slice(0, p), lang) + '<mark>' + hl(mid, lang) + '</mark>' + hl(x.slice(x.length - s), lang) : hl(x, lang);
+  };
+  return [one(a), one(b)];
+}
+
+const files = parse(JSON.parse(document.getElementById('diff').textContent));
+const main = document.getElementById('files'), tree = document.getElementById('tree');
+let view = store.get('view') || 'unified';
+
+const cls = l => l.t === '+' ? 'add' : l.t === '-' ? 'del' : '';
+const uniRow = l => `<tr class="${cls(l)}"><td class="ln">${l.o ?? ''}</td><td class="ln">${l.n ?? ''}</td>` +
+  `<td class="c" data-s="${l.t}">${l.html}</td></tr>`;
+const side = (l, k) => l ? `<td class="ln ${cls(l)}">${l[k]}</td><td class="c ${cls(l)}" data-s="${l.t}">${l.html}</td>`
+  : '<td class="ln empty"></td><td class="c empty"></td>';
+const splitRow = ([d, a]) => `<tr>${side(d, 'o')}${side(a, 'n')}</tr>`;
+
+function table(f) {
+  if (!f.hunks.length) return `<div class="note">${f.binary ? 'Binary file changed' : esc(f.meta) || 'File renamed without changes'}</div>`;
+  if (!f.hunks[0].pairs) f.hunks.forEach(h => prep(h, language(f.name)));
+  const split = view === 'split';
+  return `<table class="${view}"><colgroup>${split ? '<col class="lnc"><col class="sl"><col class="lnc"><col class="sr">' : '<col class="lnc"><col class="lnc"><col>'}</colgroup>` +
+    f.hunks.map((h, j) => `<tbody><tr class="hh"><td colspan="${split ? 4 : 3}"><label><input type="checkbox" data-hunk="${j}"> ` +
+      `${esc(h.head)}</label></td></tr>${split ? h.pairs.map(splitRow).join('') : h.lines.map(uniRow).join('')}</tbody>`).join('') +
+    '</table>' + (split ? '<div class="gutter" title="Drag to resize, double-click to reset"></div>' : '');
+}
+
+const label = f => f.status === 'renamed' ? `${f.old} → ${f.new}` : f.name;
+main.innerHTML = files.map((f, i) => `<section class="file" id="f${i}">
+  <div class="fhead"><span class="chev">▾</span><span class="badge ${f.status}" title="${f.status}">${f.status[0].toUpperCase()}</span>
+  <span class="name">${esc(label(f))}</span><span class="stat"><span class="a">+${f.adds}</span> <span class="d">−${f.dels}</span></span>
+  <label class="vw"><input type="checkbox" data-file> Viewed</label></div><div class="fbody"></div></section>`).join('');
+tree.innerHTML = files.map((f, i) => {
+  const cut = f.name.lastIndexOf('/') + 1;
+  return `<li><a href="#f${i}"><span class="p"><span class="dir">${esc(f.name.slice(0, cut)).replaceAll('/', '/<wbr>')}</span>${esc(f.name.slice(cut))}</span>` +
+    `<span class="stat"><span class="a">+${f.adds}</span> <span class="d">−${f.dels}</span></span></a></li>`;
+}).join('');
+const secs = [...main.children], items = [...tree.children];
+
+const viewed = i => files[i].keys.every(k => store.get(k));
+
+function body(i) {
+  const sec = secs[i];
+  if (sec.classList.contains('collapsed') || sec.dataset.view === view) return;
+  sec.querySelector('.fbody').innerHTML = table(files[i]);
+  sec.dataset.view = view;
+  sync(i);
+}
+
+function sync(i) {
+  const sec = secs[i], v = viewed(i);
+  sec.classList.toggle('viewed', v);
+  sec.querySelector('[data-file]').checked = v;
+  items[i].classList.toggle('viewed', v);
+  sec.querySelectorAll('tbody').forEach((tb, j) => {
+    const done = !!store.get(files[i].keys[j]);
+    tb.classList.toggle('done', done);
+    tb.querySelector('input').checked = done;
+  });
+}
+
+function progress() {
+  const k = files.filter((_, i) => viewed(i)).length;
+  document.getElementById('count').textContent = `${k} / ${files.length} files viewed`;
+  Object.assign(document.getElementById('bar'), {max: files.length, value: k});
+}
+
+function collapse(i, c) {
+  secs[i].classList.toggle('collapsed', c);
+  body(i);
+}
+
+// Collapsing a file whose header is stuck to the top would jump the page; keep its header in view instead.
+function collapseViewed(i) {
+  collapse(i, true);
+  if (secs[i].getBoundingClientRect().top < 48) secs[i].scrollIntoView();
+}
+
+main.addEventListener('change', e => {
+  const i = secs.indexOf(e.target.closest('.file'));
+  if (e.target.matches('[data-file]')) {
+    files[i].keys.forEach(k => store.set(k, e.target.checked ? '1' : null));
+    e.target.checked ? collapseViewed(i) : collapse(i, false);
+  } else if (e.target.matches('[data-hunk]')) {
+    store.set(files[i].keys[e.target.dataset.hunk], e.target.checked ? '1' : null);
+    if (viewed(i)) collapseViewed(i);
+  }
+  sync(i);
+  progress();
+});
+main.addEventListener('click', e => {
+  const head = e.target.closest('.fhead');
+  if (head && !e.target.closest('label')) {
+    const i = secs.indexOf(head.parentElement);
+    collapse(i, !secs[i].classList.contains('collapsed'));
+  }
+});
+tree.addEventListener('click', e => {
+  const a = e.target.closest('a');
+  if (a) collapse(+a.hash.slice(2), false);
+});
+
+// The split-view divider position is shared by all files.
+const setSplit = v => document.documentElement.style.setProperty('--split', v);
+if (store.get('split')) setSplit(store.get('split'));
+main.addEventListener('pointerdown', e => {
+  const g = e.target.closest('.gutter');
+  if (!g) return;
+  e.preventDefault();
+  g.setPointerCapture(e.pointerId);
+  g.classList.add('drag');
+  const box = g.parentElement.getBoundingClientRect(), grab = e.clientX - g.getBoundingClientRect().left - 4;
+  let v;
+  g.onpointermove = m => setSplit(v = Math.min(.85, Math.max(.15, (m.clientX - grab - box.left - 52) / (box.width - 104))));
+  g.onpointerup = () => {
+    g.onpointermove = g.onpointerup = null;
+    g.classList.remove('drag');
+    if (v) store.set('split', v);
+  };
+});
+main.addEventListener('dblclick', e => {
+  if (e.target.closest('.gutter')) { setSplit(.5); store.set('split', null); }
+});
+
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+function setView(v) {
+  view = v;
+  store.set('view', v);
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  secs.forEach((_, i) => body(i));
+}
+document.getElementById('expand').onclick = () => secs.forEach((_, i) => collapse(i, false));
+document.getElementById('collapse').onclick = () => secs.forEach((_, i) => collapse(i, true));
+
+document.getElementById('filter').oninput = e => {
+  const q = e.target.value.toLowerCase();
+  files.forEach((f, i) => { secs[i].hidden = items[i].hidden = !label(f).toLowerCase().includes(q); });
+};
+
+// Another tab of the same (or an overlapping) diff changed a check.
+addEventListener('storage', () => { secs.forEach((_, i) => sync(i)); progress(); });
+
+document.getElementById('title').textContent = document.title;
+const adds = files.reduce((s, f) => s + f.adds, 0), dels = files.reduce((s, f) => s + f.dels, 0);
+document.getElementById('totals').innerHTML = `${files.length} files <span class="a">+${adds}</span> <span class="d">−${dels}</span>`;
+if (!files.length) main.innerHTML = '<div class="note">No file changes found in this diff.</div>';
+secs.forEach((_, i) => { secs[i].classList.toggle('collapsed', viewed(i)); sync(i); });
+setView(view);
+progress();
+</script>
+</body></html>
