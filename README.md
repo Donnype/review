@@ -1,7 +1,7 @@
 # review
 
-Review a diff in your browser like a GitHub PR, check off each change as you go, and pick up where you left off after the
-next change. One static binary, no server.
+Review a diff in your browser like a GitHub PR, check off each change as you go, and pick up where you left off after
+your next edit. One static binary, no server.
 
 ```sh
 git diff main | review
