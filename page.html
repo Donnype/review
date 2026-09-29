@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>{{TITLE}}</title>
+<html lang="en"><head><meta charset="utf-8"><title>{{TITLE}}</title><link id="icon" rel="icon">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root{color-scheme:light dark;--split:.5;--bg:#fff;--fg:#1f2328;--muted:#59636e;--bd:#d1d9e0;--hbg:#f6f8fa;--hover:#eff2f5;--hunk:#ddf4ff;--empty:#f6f8fa;
@@ -253,8 +253,13 @@ function sync(i) {
   });
 }
 
+const svg = shapes => `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'>${shapes}</svg>`;
+const iconTodo = svg("<rect y='2' width='16' height='5' rx='1' fill='%23cf222e'/><rect y='9' width='16' height='5' rx='1' fill='%232da44e'/>");
+const iconDone = svg("<rect width='16' height='16' rx='3' fill='%232da44e'/><path d='M4 8.5l2.5 2.5L12 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>");
+
 function progress() {
   const k = files.filter((_, i) => viewed(i)).length;
+  document.getElementById('icon').href = k === files.length ? iconDone : iconTodo;
   document.getElementById('count').textContent = `${k} / ${files.length} files viewed`;
   Object.assign(document.getElementById('bar'), {max: files.length, value: k});
 }
