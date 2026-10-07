@@ -23,7 +23,7 @@ git diff main | review
 go install github.com/Donnype/review@latest
 ```
 
-Needs Go 1.27+ and `~/go/bin` on your `PATH`. Prebuilt Linux, macOS and Windows binaries are attached to each
+Needs Go 1.21+ and `~/go/bin` on your `PATH`. Prebuilt Linux, macOS and Windows binaries are attached to each
 [CI run](https://github.com/Donnype/review/actions/workflows/build.yaml).
 
 ## Usage

@@ -1,3 +1,3 @@
 module github.com/Donnype/review
 
-go 1.27
+go 1.21
